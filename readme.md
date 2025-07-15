@@ -1,4 +1,4 @@
-# 🗓️ Event Booking API
+# 🗓️ Golang - Event Booking API
 
 A robust RESTful API built using Go and the Gin framework to manage events, user registration, and secure access control. Users can explore and book events, with permissions in place for creation, editing, and registration.
 
