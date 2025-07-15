@@ -1,59 +1,15 @@
 package main
 
 import (
-	"net/http"
-	"strconv"
-
 	"example.com/go_rest_api_backend_project/db"
-	"example.com/go_rest_api_backend_project/models"
+	"example.com/go_rest_api_backend_project/routes"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
     db.InitDB()      // ✅ Initialize DB first
     server := gin.Default()
-    server.GET("/events", getEvents)
-    server.GET("/events/:id", getEvent) // dynamic path handler setup using /:id
-    server.POST("/events", createEvent)
+    routes.RegisterRoutes(server) // as gin.Defalut() already returns pointer so you don't need to specify pointer while passing argument
     server.Run(":8080")
 }
 
-func getEvents(context *gin.Context){
-	events,err := models.GetAllEvents()
-	if err != nil{
-		context.JSON(http.StatusBadRequest, gin.H{"message": "Could not parse request data."})
-		return
-	}
-	context.JSON(http.StatusOK, events)
-}
-
-func getEvent(context *gin.Context){
-    eventId,err := strconv.ParseInt(context.Param("id"),10,64)
-    // this method provides you the parameter values from the endpoint
-    // as id field in our database model is int so we need to parse it to Int so Parse int needs the value we need to convert and in what base int and what bitSide
-    if err != nil{
-		context.JSON(http.StatusBadRequest, gin.H{"message": "Could not parse event id."})
-		return
-	}
-    events,err := models.GetEventById(eventId)
-    if err !=nil{
-        context.JSON(http.StatusInternalServerError, gin.H{"message": "Could not fetch event."})
-		return
-    }
-    context.JSON(http.StatusOK,events)
-}
-
-func createEvent(c *gin.Context) {
-    var event models.Event
-    if err := c.ShouldBindJSON(&event); err != nil {
-        c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid event format."})
-        return
-    }
-
-    if err := event.Save(); err != nil {
-        c.JSON(http.StatusInternalServerError, gin.H{"message": "Could not create event."})
-        return
-    }
-
-    c.JSON(http.StatusCreated, gin.H{"message": "Event created successfully!", "event": event})
-}
