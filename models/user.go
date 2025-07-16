@@ -1,0 +1,35 @@
+package models
+
+import (
+	"example.com/go_rest_api_backend_project/db"
+	"example.com/go_rest_api_backend_project/utils"
+)
+
+type User struct {
+	ID           int64
+	Email        string `Binding:"required"`
+	Password     string `Binding:"required"`
+}
+
+func (u *User) Save() error {
+	query := `INSERT INTO users (email, password) VALUES (?, ?)`
+	stmt, err := db.DB.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	hashedPassword,err := utils.HashPassword(u.Password)
+	if err != nil {
+		return err
+	}
+	result, err := stmt.Exec(u.Email, hashedPassword)
+	if err != nil {
+		return err
+	}
+
+	id, err := result.LastInsertId()
+	if err == nil {
+		u.ID = id
+	}
+	return err
+}
