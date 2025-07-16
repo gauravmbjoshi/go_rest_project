@@ -12,10 +12,10 @@ type Event struct {
 	Description string `Binding:"required"`
 	Location    string `Binding:"required"`
 	DateTime    time.Time `Binding:"required"`
-	UserID      int
+	UserID      int64
 }
 
-func (e Event) Save() error{
+func (e *Event) Save() error{
 	query := `INSERT INTO events (name,description,location,dateTime,user_id) 
 							VALUES(?,?,?,?,?)`
 	stmt,err := db.DB.Prepare(query) // we can directly use exec but using prep gives better performance in certain places

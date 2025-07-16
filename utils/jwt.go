@@ -7,10 +7,10 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 const secretKey = "super-secret"
-func GenerateToken(email string,id int64) (string,error) {
+func GenerateToken(email string,userId int64) (string,error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"email":email,
-		"id":id,
+		"userId":userId,
 		"exp": time.Now().Add(time.Hour * 2).Unix(),
 		// exp is at what time it should expire so we added 2 hours from the time of login and we get value in Unix
 	})
@@ -18,7 +18,7 @@ func GenerateToken(email string,id int64) (string,error) {
 	return token.SignedString([]byte(secretKey))
 }
 
-func CheckToken(token string) error {
+func CheckToken(token string) (int64,error) {
 	parsedToken,err := jwt.Parse(token,func (token *jwt.Token)(interface{},error){
 		_,ok := token.Method.(*jwt.SigningMethodHMAC) // to check if the token has same SigningMethodHS256 which we used to generate token
 		// in go if you want to check the type you can add . and then in parenthesis the type you want it to be so in above line Method.(*jwt.SigningMethodHMAC) we check the type of the token.Method
@@ -28,19 +28,19 @@ func CheckToken(token string) error {
 		return []byte(secretKey),nil
 	})
 	if err != nil {
-		return errors.New("could not parse token")
+		return 0,errors.New("could not parse token")
 	}
 	tokenIsValid := parsedToken.Valid
 	if !tokenIsValid{
-		return errors.New("Invalid token")
+		return 0,errors.New("Invalid token")
 	}
-	// claims ,ok := parsedToken.Claims.(jwt.MapClaims)
-	// if !ok {
-	// 	return errors.New("Invalid token claim")
-	// }
+	claims ,ok := parsedToken.Claims.(jwt.MapClaims)
+	if !ok {
+		return 0,errors.New("Invalid token claim")
+	}
 	// email := claims["email"].(string)
-	// userId := claims["id"].(string)
+	userId := int64(claims["userId"].(float64)) // here we checked if it is float64 and then converted to int64
 	// the above code is to showcase how you can get the email and id which you created in jwt while login
-	return nil
+	return userId,nil
 
 }

@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -41,19 +42,22 @@ func createEvent(c *gin.Context) {
         c.JSON(http.StatusUnauthorized, gin.H{"message":"not authorized"})
         return
     }
-    err := utils.CheckToken(token)
+    userId,err := utils.CheckToken(token)
     if err != nil {
         c.JSON(http.StatusUnauthorized, gin.H{"message":"not authorized"})
         return
     }
     // the above code checks the token
     var event models.Event
-    if err := c.ShouldBindJSON(&event); err != nil {
+    err = c.ShouldBindJSON(&event)
+    if err != nil {
         c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid event format."})
         return
     }
-
-    if err := event.Save(); err != nil {
+    fmt.Print(userId)
+    event.UserID = userId
+    err = event.Save()
+    if err != nil {
         c.JSON(http.StatusInternalServerError, gin.H{"message": "Could not create event."})
         return
     }

@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"fmt"
 	"net/http"
 
 	"example.com/go_rest_api_backend_project/models"
@@ -23,15 +24,17 @@ func signup(context *gin.Context){
 
 func login(context *gin.Context) {
 	var user models.User
-	if err := context.ShouldBindJSON(&user); err != nil {
+	err := context.ShouldBindJSON(&user)
+	if  err != nil {
         context.JSON(http.StatusBadRequest, gin.H{"message": "Invalid user format."})
         return
     }
-	err := user.ValidateCredentials()
+	err = user.ValidateCredentials()
 	if err != nil {
 		context.JSON(http.StatusUnauthorized, gin.H{"message":err.Error()})
         return
 	}
+	fmt.Print(user.ID)
 	token,err := utils.GenerateToken(user.Email,user.ID)
 
 	if err != nil {
