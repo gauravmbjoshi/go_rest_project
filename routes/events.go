@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"example.com/go_rest_api_backend_project/models"
+	"example.com/go_rest_api_backend_project/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -34,6 +35,18 @@ func getEvent(context *gin.Context){
 }
 
 func createEvent(c *gin.Context) {
+    token := c.Request.Header.Get("Authorization")
+
+    if token == "" {
+        c.JSON(http.StatusUnauthorized, gin.H{"message":"not authorized"})
+        return
+    }
+    err := utils.CheckToken(token)
+    if err != nil {
+        c.JSON(http.StatusUnauthorized, gin.H{"message":"not authorized"})
+        return
+    }
+    // the above code checks the token
     var event models.Event
     if err := c.ShouldBindJSON(&event); err != nil {
         c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid event format."})

@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"errors"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -15,4 +16,31 @@ func GenerateToken(email string,id int64) (string,error) {
 	})
 	// this will create a token with claims meaning data attached to it
 	return token.SignedString([]byte(secretKey))
+}
+
+func CheckToken(token string) error {
+	parsedToken,err := jwt.Parse(token,func (token *jwt.Token)(interface{},error){
+		_,ok := token.Method.(*jwt.SigningMethodHMAC) // to check if the token has same SigningMethodHS256 which we used to generate token
+		// in go if you want to check the type you can add . and then in parenthesis the type you want it to be so in above line Method.(*jwt.SigningMethodHMAC) we check the type of the token.Method
+		if !ok {
+			return nil,errors.New("Unexpected signing method")
+		}
+		return []byte(secretKey),nil
+	})
+	if err != nil {
+		return errors.New("could not parse token")
+	}
+	tokenIsValid := parsedToken.Valid
+	if !tokenIsValid{
+		return errors.New("Invalid token")
+	}
+	// claims ,ok := parsedToken.Claims.(jwt.MapClaims)
+	// if !ok {
+	// 	return errors.New("Invalid token claim")
+	// }
+	// email := claims["email"].(string)
+	// userId := claims["id"].(string)
+	// the above code is to showcase how you can get the email and id which you created in jwt while login
+	return nil
+
 }
