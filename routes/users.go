@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"example.com/go_rest_api_backend_project/models"
+	"example.com/go_rest_api_backend_project/utils"
 	"github.com/gin-gonic/gin"
 )
 func signup(context *gin.Context){
@@ -31,5 +32,12 @@ func login(context *gin.Context) {
 		context.JSON(http.StatusUnauthorized, gin.H{"message":err.Error()})
         return
 	}
-	context.JSON(http.StatusOK, gin.H{"message":"Login successful!"})
+	token,err := utils.GenerateToken(user.Email,user.ID)
+
+	if err != nil {
+		context.JSON(http.StatusUnauthorized, gin.H{"message":err.Error()})
+        return
+	}
+
+	context.JSON(http.StatusOK, gin.H{"message":"Login successful!","token":token})
 }
