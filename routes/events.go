@@ -1,12 +1,10 @@
 package routes
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
 	"example.com/go_rest_api_backend_project/models"
-	"example.com/go_rest_api_backend_project/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -36,25 +34,13 @@ func getEvent(context *gin.Context){
 }
 
 func createEvent(c *gin.Context) {
-    token := c.Request.Header.Get("Authorization")
-
-    if token == "" {
-        c.JSON(http.StatusUnauthorized, gin.H{"message":"not authorized"})
-        return
-    }
-    userId,err := utils.CheckToken(token)
-    if err != nil {
-        c.JSON(http.StatusUnauthorized, gin.H{"message":"not authorized"})
-        return
-    }
-    // the above code checks the token
     var event models.Event
-    err = c.ShouldBindJSON(&event)
+    err := c.ShouldBindJSON(&event)
     if err != nil {
         c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid event format."})
         return
     }
-    fmt.Print(userId)
+    userId := c.GetInt64("userId") //this will convert the value in right type int64 which we want
     event.UserID = userId
     err = event.Save()
     if err != nil {

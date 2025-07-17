@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"fmt"
 	"net/http"
 
 	"example.com/go_rest_api_backend_project/models"
@@ -34,7 +33,6 @@ func login(context *gin.Context) {
 		context.JSON(http.StatusUnauthorized, gin.H{"message":err.Error()})
         return
 	}
-	fmt.Print(user.ID)
 	token,err := utils.GenerateToken(user.Email,user.ID)
 
 	if err != nil {
