@@ -1,10 +1,10 @@
 POST http://localhost:8080/events
 content-type: application/json
-authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im5ld3Rlc3RAYXBpLmNvbSIsImV4cCI6MTc1MjcwMDU2NSwidXNlcklkIjoyfQ.URoKWZ8sBNAWQnwoh44tst5JFq1tWzy1RAgFNSCme8M
+authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAYXBpLmNvbSIsImV4cCI6MTc1MjczMzExMywidXNlcklkIjoxfQ.oThtA7nTfEBsf136ykwOCqqZnGqEuGdTww9nf8n1RFI
 
 {
-    "name":"new test event",
-    "description":"test event Party",
-    "location":"test location",
+    "name":"my test event",
+    "description":"my event Party",
+    "location":"my location",
     "datetime": "2025-07-07T15:30:00.000Z"
 }

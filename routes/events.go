@@ -53,14 +53,19 @@ func createEvent(c *gin.Context) {
 
 func updateEvent(context *gin.Context){
 	eventId,err := strconv.ParseInt(context.Param("id"),10,64)
-	if err != nil{
+	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"message": "Could not parse event id."})
 		return
 	}
-    _,err = models.GetEventById(eventId)
-    if err !=nil{
+    userId := context.GetInt64("userId")
+    event,err := models.GetEventById(eventId)
+    if err !=nil {
         context.JSON(http.StatusInternalServerError, gin.H{"message": "Could not fetch event."})
 		return
+    }
+    if event.UserID != userId {
+        context.JSON(http.StatusUnauthorized,gin.H{"message":"not unauthorized to update event"})
+        return
     }
 	var updateEvent models.Event
 	err = context.ShouldBindJSON(&updateEvent);
@@ -82,10 +87,15 @@ func deleteEvent(context *gin.Context){
 		context.JSON(http.StatusBadRequest, gin.H{"message": "Could not parse event id."})
 		return
 	}
+    userId := context.GetInt64("userId")
     event,err := models.GetEventById(eventId)
-    if err !=nil{
+    if err !=nil {
         context.JSON(http.StatusInternalServerError, gin.H{"message": "Could not fetch event."})
 		return
+    }
+    if event.UserID != userId {
+        context.JSON(http.StatusUnauthorized,gin.H{"message":"not unauthorized to delete event"})
+        return
     }
 
     err = event.Delete()
