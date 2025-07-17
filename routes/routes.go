@@ -19,7 +19,8 @@ func RegisterRoutes(server *gin.Engine) { // as we are pointing to the server we
 	// 3rd you protect the routes below that
 	authenticated.PUT("/events/:id",updateEvent)
 	authenticated.DELETE("/events/:id",deleteEvent)
-	
+	authenticated.POST("/events/:id/register",registerForEvent)
+	authenticated.DELETE("/events/:id/register",cancleRegistration)
 	server.POST("/signup",signup)
 	server.POST("/login",login)
 }

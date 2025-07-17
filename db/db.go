@@ -21,6 +21,7 @@ func InitDB(){
 }
 
 func createTables(){
+	
 	createUsersTable := `
 		CREATE TABLE IF NOT EXISTS users (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -54,6 +55,21 @@ func createTables(){
 	if err != nil {
 		panic(fmt.Sprintf("Could not create events table: %v", err))
 	}
+
+	createRegistration := `
+	CREATE TABLE IF NOT EXISTS registrations (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		event_id INTEGER,
+		user_id INTEGER,
+		FOREIGN KEY (event_id) REFERENCES events(id),
+		FOREIGN KEY (user_id) REFERENCES users(id)
+	)
+	`
+	_, err = DB.Exec(createRegistration)
+	if err != nil {
+		panic(fmt.Sprintf("Could not create registrations table: %v", err))
+	}
+
 }
 
 // Preparing Statements vs Directly Executing Queries (Prepare() vs Exec()/Query())
@@ -80,3 +96,4 @@ func createTables(){
 // And, indeed, in this application, we are calling stmt.Close() directly after calling stmt.Exec(). So here, it really wouldn't matter which approach you're using.
 
 // But in order to show you the different ways of using the sql package, I decided to also include this preparation approach in this course.
+
